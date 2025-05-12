@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "news-scraper"
+version = "0.1.0"
+description = "News scraping and ETL pipeline"
+authors = ["Your Name"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+scrapy = "^2.11.0"
+asyncio = "^3.4.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

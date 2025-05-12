@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 fastapi==0.110.1
 uvicorn[standard]==0.29.0
 python-dotenv==1.0.1
@@ -7,3 +8,22 @@ transformers==4.41.1
 nltk==3.8.1
 asyncpg==0.29.0
 torch>=2.1.0
+=======
+# Core dependencies
+asyncpg==0.27.0
+datasketch==1.5.3
+nltk==3.8.1
+python-dotenv==1.0.0
+scrapy==2.9.0
+simhash
+spacy
+python-dateutil
+pytz
+nltk
+numpy==1.23.5
+# Additional utilities
+regex
+requests
+# Ensure compatibility with asyncio
+aiotools==0.8.0
+>>>>>>> f227b383e035cd5a8cd05ddc99413dcd5f8eb443

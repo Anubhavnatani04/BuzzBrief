@@ -1,0 +1,17 @@
+{
+  "name": "collegeproject",
+  "version": "1.0.0",
+  "description": "ETL pipeline and scraping project",
+  "main": "trigger/etl.js",
+  "type": "module",
+  "scripts": {
+    "deploy": "trigger deploy --project collegeproject --prod",
+    "start": "node ./trigger/etl.js"
+  },
+  "dependencies": {
+    "@trigger.dev/python": "^3.3.17",
+    "@trigger.dev/sdk": "^3.3.17",
+    "path": "^0.12.7",
+    "trigger.dev": "^3.3.17"
+  }
+}
