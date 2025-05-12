@@ -1,6 +1,6 @@
 import scrapy
-from datetime import datetime  # added import
-from news_scraper.items import NewsScraperItem  # added import
+from datetime import datetime
+from news_scraper.news_scraper.items import NewsScraperItem
 
 class TimeForKidsSpider(scrapy.Spider):
     name = "time_for_kids"
@@ -27,9 +27,18 @@ class TimeForKidsSpider(scrapy.Spider):
         item["content"] = " ".join(response.css("div.article-show__content-article p::text").getall())
         item["source"] = "Time for Kids"
         item["url"] = response.url
-        item["published_at"] = response.css("h3.article-show__content-date::text").get()
+        published_text = response.css("h3.article-show__content-date::text").get()
+        if published_text:
+            try:
+                published_date = datetime.strptime(published_text, "%B %d, %Y")
+                item["published_at"] = published_date.timestamp()
+            except:
+                item["published_at"] = datetime.now().timestamp()
+        else:
+            item["published_at"] = datetime.now().timestamp()
+            
         item["is_kid_friendly"] = True
-        item["created_at"] = datetime.now()
+        item["created_at"] = datetime.now().timestamp
         item["categories"] = response.css("ul.article-show__content-sections a::text").getall()
         item["description"] = item["content"].split(".")[0] + "." if "." in item["content"] else item["content"]
         if(item["title"] and item["content"]):

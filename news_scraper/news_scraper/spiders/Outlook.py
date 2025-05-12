@@ -1,6 +1,7 @@
 import scrapy
 from datetime import datetime
-from news_scraper.items import NewsScraperItem
+from news_scraper.news_scraper.items import NewsScraperItem
+from dateutil.parser import parse
 
 class OutlookSpider(scrapy.Spider):
     name = "Outlook"
@@ -25,13 +26,20 @@ class OutlookSpider(scrapy.Spider):
         # Retrieve image URL, if present
         item["image_url"] = response.css("div.main-img-div img::attr(src)").get()
         # Extract published date from an assumed element; adjust selector as needed
-        datetime_attr = response.css("div.story-dec-time time::attr(datetime)").get(default="")
-        item["published_at"] = datetime_attr.split("T")[0] if "T" in datetime_attr else ""
+        datetime_str = response.css("div.story-dec-time time::attr(datetime)").get()
+        if datetime_str:
+            try:
+                date_obj = parse(datetime_str)
+                item["published_at"] = date_obj.timestamp()
+            except:
+                item["published_at"] = datetime.now().timestamp()
+        else:
+            item["published_at"] = datetime.now().timestamp()
         # Set static/required fields
         item["source"] = "Outlook India"
         item["url"] = response.url
         item["is_kid_friendly"] = False
-        item["created_at"] = datetime.now()
+        item["created_at"] = datetime.now().timestamp()
         # Extract categories (if available)
         item["categories"] = response.css("p.story-slug *::text").getall()
         item["description"] = response.css("p.subcap-story::text").get()

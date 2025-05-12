@@ -1,6 +1,6 @@
 import scrapy
 from datetime import datetime
-from news_scraper.items import NewsScraperItem
+from news_scraper.news_scraper.items import NewsScraperItem
 
 class EconomicTimesSpider(scrapy.Spider):
     name = "Economic_times"
@@ -101,20 +101,20 @@ class EconomicTimesSpider(scrapy.Spider):
             # Get image URL if available
             item['image_url'] = response.css('figure.articleImg img::attr(src), figure.artImg img::attr(src)').get()
             
-            # Updated date extraction logic
+            # Updated timestamp handling
             date_timestamp = response.css('time.jsdtTime::attr(data-dt)').get()
             if date_timestamp:
-                # Convert milliseconds timestamp to datetime
-                date_obj = datetime.fromtimestamp(int(date_timestamp)/1000)
-                item['published_at'] = date_obj.strftime("%Y-%m-%d")
+                # Convert milliseconds to seconds for Unix timestamp
+                item['published_at'] = int(date_timestamp) / 1000
             else:
-                item['published_at'] = ""
+                # Default to current timestamp if not found
+                item['published_at'] = datetime.now().timestamp()
 
             # Static fields
             item['source'] = "Economic Times"
             item['url'] = response.url
             item['is_kid_friendly'] = False
-            item['created_at'] = datetime.now()
+            item['created_at'] = datetime.now().timestamp()
             
             # Set categories based on URL path
             category = response.meta.get('category', 'news')
@@ -127,9 +127,8 @@ class EconomicTimesSpider(scrapy.Spider):
             else:
                 item['description'] = item['title']
             
-            # if item['title'] and item['content']:
-            #     
-            yield item
+            if item['title'] and item['content']:
+                yield item 
                 
         except Exception as e:
             self.logger.error(f"Error parsing article {response.url}: {str(e)}")

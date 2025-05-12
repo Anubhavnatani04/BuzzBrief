@@ -12,3 +12,11 @@ class NewsScraperPipeline:
     def process_item(self, item, spider):
         logging.info(f"Processing item: {item}")
         return item
+
+class CollectorPipeline:
+    """Pipeline to collect items and pass them to callback"""
+    
+    def process_item(self, item, spider):
+        if hasattr(spider, 'parse_item'):
+            spider.parse_item(item)
+        return item

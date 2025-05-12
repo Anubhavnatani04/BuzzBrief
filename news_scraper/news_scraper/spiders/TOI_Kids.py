@@ -1,16 +1,18 @@
 import scrapy
 from datetime import datetime
-from news_scraper.items import NewsScraperItem
+from news_scraper.news_scraper.items import NewsScraperItem
 import logging
 import re
 
-
-class TimeOfIndiaSpider(scrapy.Spider):
+class TOI_kidsSpider(scrapy.Spider):
     name = "TOI_Kids"
     allowed_domains = ["toistudent.timesofindia.indiatimes.com"]
     start_urls = ["https://toistudent.timesofindia.indiatimes.com/news/top-news/"]
-    page_count = 0  # Add page counter
-    
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page_count = 0  # now an instance attribute
+
     def parse(self, response):
         # Extract article links with better selectors
         article_links = response.css("div.usrcont a[href^='https://']::attr(href), div.most_text a[href^='https://']::attr(href)").getall()
@@ -61,17 +63,17 @@ class TimeOfIndiaSpider(scrapy.Spider):
 
             item["content"] = " ".join(cleaned_content)
             
-            # **Extract and clean date (Only Date, No Time)**
+            # Extract and convert date to timestamp
             date_text = response.css("li.date::text").get("")
             date_text = date_text.replace("Publish Date:", "").strip()
 
             try:
-                # Convert to date format (ignoring time)
-                parsed_date = datetime.strptime(date_text, "%b %d %Y %I:%M%p").date()
-                item["published_at"] = parsed_date.strftime("%Y-%m-%d")  # Format: YYYY-MM-DD
+                # Parse the date string to datetime object
+                parsed_date = datetime.strptime(date_text, "%b %d %Y %I:%M%p")
+                # Convert to Unix timestamp
+                item["published_at"] = parsed_date.timestamp()
             except ValueError:
-                item["published_at"] = None  # Set to None if parsing fails
-
+                item["published_at"] = datetime.now().timestamp()
             
             # Categories extraction
             categories = response.css("div.article-tags span::text, div.categories a::text").getall()
@@ -81,7 +83,7 @@ class TimeOfIndiaSpider(scrapy.Spider):
             item["source"] = "Times of India Student"
             item["url"] = response.url
             item["is_kid_friendly"] = True
-            item["created_at"] = datetime.now()
+            item["created_at"] = datetime.now().timestamp()
             
             # Only yield item if we have at least title or content
             if item["title"] or item["content"]:

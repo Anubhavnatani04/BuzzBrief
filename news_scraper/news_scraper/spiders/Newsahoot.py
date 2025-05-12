@@ -1,7 +1,8 @@
 import scrapy
 from datetime import datetime
-from news_scraper.items import NewsScraperItem
+from news_scraper.news_scraper.items import NewsScraperItem
 import json
+from dateutil.parser import parse
 
 class NewsahootSpider(scrapy.Spider):
     name = "Newsahoot"
@@ -43,11 +44,15 @@ class NewsahootSpider(scrapy.Spider):
         clean_body = remove_tags(raw_body).strip()
         item["content"] = clean_body
         
-        item["published_at"] = data.get("publishedAt", "")
+        # Convert ISO format to timestamp
+        published_date = parse(data.get("publishedAt", ""))
+        item["published_at"] = published_date.timestamp()
+        
         item["source"] = "Newsahoot"
         item["url"] = response.meta.get("article_url", "")
         item["is_kid_friendly"] = True
-        item["created_at"] = datetime.now()
+        item["created_at"] = datetime.now().timestamp()
         item["categories"] = data.get("category", [])
         
-        yield item
+        if item["title"] and item["content"]:
+            yield item

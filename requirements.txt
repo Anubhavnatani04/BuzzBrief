@@ -1,0 +1,17 @@
+# Core dependencies
+asyncpg==0.27.0
+datasketch==1.5.3
+nltk==3.8.1
+python-dotenv==1.0.0
+scrapy==2.9.0
+simhash
+spacy
+python-dateutil
+pytz
+nltk
+numpy==1.23.5
+# Additional utilities
+regex
+requests
+# Ensure compatibility with asyncio
+aiotools==0.8.0
